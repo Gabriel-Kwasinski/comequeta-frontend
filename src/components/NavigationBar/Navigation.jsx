@@ -1,24 +1,26 @@
 import './Navigation.css'
 
-function Navigation () {
+function Navigation() {
   const path = window.location.pathname
 
   return (
-    <nav class='nav'>
-      <a href='/' className="site-title">Come Que Ta</a>
+    <nav class="nav">
+      <a href="/" className="site-title">
+        Come Que Ta
+      </a>
       <ul>
         <li>
-          <a href='/map'>Map</a>
+          <a href="/map">Map</a>
         </li>
         <li>
-          <a href='/chats'>Chats</a>
+          <a href="/chats">Chats</a>
         </li>
         <li>
-          <a href='/profile'>Perfil</a>
+          <a href="/profile">Perfil</a>
         </li>
       </ul>
     </nav>
-  );
+  )
 }
 
-export default Navigation;
+export default Navigation
