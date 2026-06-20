@@ -10,22 +10,20 @@ function App() {
 
   console.log(window.location)
   switch (window.location.pathname) {
-    case "/signup":
+    case '/signup':
       component = <Signup></Signup>
       break
-    case "/map":
+    case '/map':
       component = <MapPage></MapPage>
       break
-    case "/chats":
+    case '/chats':
       component = <ChatPage></ChatPage>
       break
-    case "/profile":
+    case '/profile':
       component = <ProfilePage></ProfilePage>
       break
   }
-  return (
-    component
-  );
+  return component
 }
 
-export default App;
+export default App

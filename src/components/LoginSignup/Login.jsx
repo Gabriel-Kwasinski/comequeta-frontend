@@ -1,14 +1,11 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import './Login.css'
 
-function Login () {
-
+function Login() {
   return (
-    <div className='container'>
+    <div className="container">
       <div className="header">
-        <div className="text">
-          Login
-        </div>
+        <div className="text">Login</div>
         <div className="underline"></div>
       </div>
       <div className="inputs">
@@ -25,14 +22,19 @@ function Login () {
         <span> Esqueci minha senha</span>
       </div>
       <div className="submit-container">
-        <a className="submit" href='/map'>Entrar</a>
+        <a className="submit" href="/map">
+          Entrar
+        </a>
       </div>
       <div className="register">
         Nao tem uma conta?
-        <a className='register-btn' href='/signup'> Registre-se</a>
+        <a className="register-btn" href="/signup">
+          {' '}
+          Registre-se
+        </a>
       </div>
     </div>
-  );
+  )
 }
 
-export default Login;
+export default Login

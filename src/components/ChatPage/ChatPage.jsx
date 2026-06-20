@@ -1,13 +1,12 @@
 import Navigation from '../NavigationBar/Navigation.jsx'
 
-function ChatPage () {
-
+function ChatPage() {
   return (
     <div>
       <Navigation></Navigation>
       <h1>Chat</h1>
     </div>
-  );
+  )
 }
 
-export default ChatPage;
+export default ChatPage

@@ -1,14 +1,11 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import './Signup.css'
 
-function Signup () {
-
+function Signup() {
   return (
-    <div className='container'>
+    <div className="container">
       <div className="header">
-        <div className="text">
-          Signup
-        </div>
+        <div className="text">Signup</div>
         <div className="underline"></div>
       </div>
       <div className="inputs">
@@ -32,14 +29,19 @@ function Signup () {
         </div>
       </div>
       <div className="submit-container">
-        <a className="submit" href='/map'>Criar Conta</a>
+        <a className="submit" href="/map">
+          Criar Conta
+        </a>
       </div>
       <div className="register">
         Ja tem uma conta?
-        <a class='login-btn' href='/'> Entrar</a>
+        <a class="login-btn" href="/">
+          {' '}
+          Entrar
+        </a>
       </div>
     </div>
-  );
+  )
 }
 
-export default Signup;
+export default Signup
