@@ -1,31 +1,34 @@
 import './App.css'
-import Signup from './components/LoginSignup/Signup.jsx'
-import Login from './components/LoginSignup/Login.jsx'
-import MapPage from './components/MapPage/MapPage.jsx'
-import ChatPage from './components/ChatPage/ChatPage.jsx'
-import ProfilePage from './components/ProfilePage/ProfilePage.jsx'
+import { useAuth } from './auth/AuthContext'
+import Login from './components/LoginSignup/Login.tsx'
+import Signup from './components/LoginSignup/Signup.tsx'
+import MapPage from './components/MapPage/MapPage.tsx'
+import ChatPage from './components/ChatPage/ChatPage.tsx'
+import ProfilePage from './components/ProfilePage/ProfilePage.tsx'
 
 function App() {
-  let component = <Login></Login>
+  const { isAuthenticated, isLoading } = useAuth()
+  const path = window.location.pathname
 
-  console.log(window.location)
-  switch (window.location.pathname) {
-    case "/signup":
-      component = <Signup></Signup>
-      break
-    case "/map":
-      component = <MapPage></MapPage>
-      break
-    case "/chats":
-      component = <ChatPage></ChatPage>
-      break
-    case "/profile":
-      component = <ProfilePage></ProfilePage>
-      break
+  if (isLoading) {
+    return <div className="loading">Carregando…</div>
   }
-  return (
-    component
-  );
+
+  if (!isAuthenticated) {
+    if (path === '/signup') {
+      return <Signup />
+    }
+    return <Login />
+  }
+
+  switch (path) {
+    case '/chats':
+      return <ChatPage />
+    case '/profile':
+      return <ProfilePage />
+    default:
+      return <MapPage />
+  }
 }
 
-export default App;
+export default App
