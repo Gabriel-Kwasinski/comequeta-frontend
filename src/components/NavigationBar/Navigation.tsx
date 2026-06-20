@@ -4,7 +4,9 @@ import './Navigation.css'
 function Navigation() {
   return (
     <nav className="nav">
-      <Link to="/map" className="site-title">Come Que Ta</Link>
+      <Link to="/map" className="site-title">
+        Come Que Ta
+      </Link>
       <ul>
         <li>
           <NavLink to="/map">Map</NavLink>

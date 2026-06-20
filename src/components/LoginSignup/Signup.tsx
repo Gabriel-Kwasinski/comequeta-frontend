@@ -91,7 +91,10 @@ function Signup() {
       </div>
       <div className="register">
         Ja tem uma conta?
-        <Link className="login-btn" to="/"> Entrar</Link>
+        <Link className="login-btn" to="/">
+          {' '}
+          Entrar
+        </Link>
       </div>
     </form>
   )

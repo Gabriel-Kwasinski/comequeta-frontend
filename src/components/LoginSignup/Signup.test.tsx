@@ -6,24 +6,17 @@ import { renderWithProviders } from '../../test/renderWithProviders'
 import { resetUserStore, seedUser, userStore } from '../../test/handlers'
 import Signup from './Signup'
 
-// window.location.href assignment is not implemented in jsdom; capture it instead.
-let assignedHref: string | undefined
+// Navigation now goes through react-router's useNavigate; spy on it.
+const { mockNavigate } = vi.hoisted(() => ({ mockNavigate: vi.fn() }))
+
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom')>()
+  return { ...actual, useNavigate: () => mockNavigate }
+})
 
 beforeEach(() => {
   resetUserStore()
-  assignedHref = undefined
-  Object.defineProperty(window, 'location', {
-    configurable: true,
-    value: {
-      ...window.location,
-      set href(value: string) {
-        assignedHref = value
-      },
-      get href() {
-        return assignedHref ?? ''
-      },
-    },
-  })
+  mockNavigate.mockClear()
 })
 
 afterEach(() => {
@@ -59,7 +52,7 @@ describe('Signup flow', () => {
 
     // ...and the user is authenticated (token set) and redirected.
     await waitFor(() => expect(getToken()).not.toBeNull())
-    await waitFor(() => expect(assignedHref).toBe('/map'))
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/map'))
   })
 
   it('não cria conta quando as senhas não coincidem e mostra erro no formulário', async () => {
@@ -73,15 +66,21 @@ describe('Signup flow', () => {
     await user.type(f.confirm, 'senha-diferente-2')
     await user.click(f.submit)
 
-    expect(await screen.findByText('As senhas não coincidem.')).toBeInTheDocument()
+    expect(
+      await screen.findByText('As senhas não coincidem.'),
+    ).toBeInTheDocument()
     expect(userStore.has('bruno@example.com')).toBe(false)
     expect(getToken()).toBeNull()
-    expect(assignedHref).toBeUndefined()
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it('não cria conta com email já em uso e exibe mensagem de erro', async () => {
     const user = userEvent.setup()
-    seedUser({ email: 'existe@example.com', name: 'Existente', password: 'senha-antiga-1' })
+    seedUser({
+      email: 'existe@example.com',
+      name: 'Existente',
+      password: 'senha-antiga-1',
+    })
 
     renderWithProviders(<Signup />)
     const f = fields()

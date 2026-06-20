@@ -10,24 +10,17 @@ import Login from './Login'
 
 const API = 'http://localhost:8000'
 
-// window.location.href assignment is not implemented in jsdom; capture it instead.
-let assignedHref: string | undefined
+// Navigation now goes through react-router's useNavigate; spy on it.
+const { mockNavigate } = vi.hoisted(() => ({ mockNavigate: vi.fn() }))
+
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom')>()
+  return { ...actual, useNavigate: () => mockNavigate }
+})
 
 beforeEach(() => {
   resetUserStore()
-  assignedHref = undefined
-  Object.defineProperty(window, 'location', {
-    configurable: true,
-    value: {
-      ...window.location,
-      set href(value: string) {
-        assignedHref = value
-      },
-      get href() {
-        return assignedHref ?? ''
-      },
-    },
-  })
+  mockNavigate.mockClear()
 })
 
 afterEach(() => {
@@ -45,7 +38,11 @@ function fillLoginForm() {
 describe('Login flow', () => {
   it('autentica com sucesso usando credenciais válidas e redireciona', async () => {
     const user = userEvent.setup()
-    seedUser({ email: 'ana@example.com', name: 'Ana', password: 'senha-segura-1' })
+    seedUser({
+      email: 'ana@example.com',
+      name: 'Ana',
+      password: 'senha-segura-1',
+    })
 
     renderWithProviders(<Login />)
     const form = fillLoginForm()
@@ -56,13 +53,17 @@ describe('Login flow', () => {
 
     // Token persisted and redirect issued -> authenticated.
     await waitFor(() => expect(getToken()).not.toBeNull())
-    await waitFor(() => expect(assignedHref).toBe('/map'))
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/map'))
     expect(screen.queryByText(/inválidos/i)).not.toBeInTheDocument()
   })
 
   it('não autentica com credenciais inválidas e exibe mensagem de erro', async () => {
     const user = userEvent.setup()
-    seedUser({ email: 'ana@example.com', name: 'Ana', password: 'senha-correta' })
+    seedUser({
+      email: 'ana@example.com',
+      name: 'Ana',
+      password: 'senha-correta',
+    })
 
     renderWithProviders(<Login />)
     const form = fillLoginForm()
@@ -71,9 +72,11 @@ describe('Login flow', () => {
     await user.type(form.password, 'senha-errada')
     await user.click(form.submit)
 
-    expect(await screen.findByText('Email ou senha inválidos.')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Email ou senha inválidos.'),
+    ).toBeInTheDocument()
     expect(getToken()).toBeNull()
-    expect(assignedHref).toBeUndefined()
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it('exibe mensagem de erro quando o servidor falha', async () => {
@@ -91,14 +94,18 @@ describe('Login flow', () => {
     await user.type(form.password, 'qualquer-senha')
     await user.click(form.submit)
 
-    expect(await screen.findByText('Email ou senha inválidos.')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Email ou senha inválidos.'),
+    ).toBeInTheDocument()
     expect(getToken()).toBeNull()
   })
 
   it('exige email e senha (validação nativa do formulário)', async () => {
     renderWithProviders(<Login />)
     const emailInput = screen.getByPlaceholderText('Email') as HTMLInputElement
-    const passwordInput = screen.getByPlaceholderText('Senha') as HTMLInputElement
+    const passwordInput = screen.getByPlaceholderText(
+      'Senha',
+    ) as HTMLInputElement
 
     expect(emailInput).toBeRequired()
     expect(emailInput).toHaveAttribute('type', 'email')
@@ -121,7 +128,9 @@ describe('Login flow', () => {
 
     renderWithProviders(<Login />)
     const emailInput = screen.getByPlaceholderText('Email') as HTMLInputElement
-    const passwordInput = screen.getByPlaceholderText('Senha') as HTMLInputElement
+    const passwordInput = screen.getByPlaceholderText(
+      'Senha',
+    ) as HTMLInputElement
 
     // Use a real (but script-laden) string in the password to avoid type=email rejection.
     await user.type(emailInput, 'attacker@example.com')
@@ -131,9 +140,7 @@ describe('Login flow', () => {
     await screen.findByText('Email ou senha inválidos.')
 
     // The script must never execute...
-    expect(
-      (window as unknown as { __xss?: boolean }).__xss,
-    ).toBeUndefined()
+    expect((window as unknown as { __xss?: boolean }).__xss).toBeUndefined()
     // ...and it must be carried as a plain string value, not rendered as DOM.
     expect(passwordInput.value).toBe(payload)
     expect(receivedUsername).toBe('attacker@example.com')

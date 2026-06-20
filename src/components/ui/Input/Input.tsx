@@ -2,8 +2,10 @@ import { useId } from 'react'
 import type { InputHTMLAttributes, ReactNode } from 'react'
 import './Input.css'
 
-export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface InputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'size'
+> {
   /** Visible label rendered above the field. */
   label?: ReactNode
   /** Helper or error message rendered below the field. */

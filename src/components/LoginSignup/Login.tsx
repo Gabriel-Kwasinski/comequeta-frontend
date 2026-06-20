@@ -65,7 +65,10 @@ function Login() {
       </div>
       <div className="register">
         Nao tem uma conta?
-        <Link className="register-btn" to="/signup"> Registre-se</Link>
+        <Link className="register-btn" to="/signup">
+          {' '}
+          Registre-se
+        </Link>
       </div>
     </form>
   )
