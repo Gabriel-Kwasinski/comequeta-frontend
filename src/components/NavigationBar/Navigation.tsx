@@ -1,18 +1,19 @@
+import { Link, NavLink } from 'react-router-dom'
 import './Navigation.css'
 
 function Navigation() {
   return (
     <nav className="nav">
-      <a href="/map" className="site-title">Come Que Ta</a>
+      <Link to="/map" className="site-title">Come Que Ta</Link>
       <ul>
         <li>
-          <a href="/map">Map</a>
+          <NavLink to="/map">Map</NavLink>
         </li>
         <li>
-          <a href="/chats">Chats</a>
+          <NavLink to="/chats">Chats</NavLink>
         </li>
         <li>
-          <a href="/profile">Perfil</a>
+          <NavLink to="/profile">Perfil</NavLink>
         </li>
       </ul>
     </nav>

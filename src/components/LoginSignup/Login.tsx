@@ -1,9 +1,11 @@
 import { type FormEvent, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import './Login.css'
 
 function Login() {
   const { login } = useAuth()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string>()
@@ -15,7 +17,7 @@ function Login() {
     setIsSubmitting(true)
     try {
       await login(email, password)
-      window.location.href = '/map'
+      navigate('/map')
     } catch {
       setError('Email ou senha inválidos.')
     } finally {
@@ -63,7 +65,7 @@ function Login() {
       </div>
       <div className="register">
         Nao tem uma conta?
-        <a className="register-btn" href="/signup"> Registre-se</a>
+        <Link className="register-btn" to="/signup"> Registre-se</Link>
       </div>
     </form>
   )
