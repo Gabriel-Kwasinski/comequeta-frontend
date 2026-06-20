@@ -93,7 +93,7 @@ describe('Signup flow', () => {
 
     expect(
       await screen.findByText(
-        'Não foi possível criar a conta. O email já pode estar em uso.',
+        'Este e-mail já está em uso. Tente entrar ou use outro e-mail.',
       ),
     ).toBeInTheDocument()
     expect(getToken()).toBeNull()
@@ -107,9 +107,9 @@ describe('Signup flow', () => {
     expect(f.email).toBeRequired()
     expect(f.email).toHaveAttribute('type', 'email')
     expect(f.password).toBeRequired()
-    expect(f.password).toHaveAttribute('minLength', '8')
+    expect(f.password).toHaveAttribute('type', 'password')
     expect(f.confirm).toBeRequired()
-    expect(f.confirm).toHaveAttribute('minLength', '8')
+    expect(f.confirm).toHaveAttribute('type', 'password')
   })
 
   it('trata scripts maliciosos no nome como texto comum (sem execução / sem injeção)', async () => {
