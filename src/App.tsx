@@ -1,34 +1,59 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import { useAuth } from './auth/AuthContext'
+import Layout from './components/Layout/Layout.tsx'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx'
 import Login from './components/LoginSignup/Login.tsx'
 import Signup from './components/LoginSignup/Signup.tsx'
 import MapPage from './components/MapPage/MapPage.tsx'
 import ChatPage from './components/ChatPage/ChatPage.tsx'
 import ProfilePage from './components/ProfilePage/ProfilePage.tsx'
 
-function App() {
+function PublicRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth()
-  const path = window.location.pathname
 
   if (isLoading) {
     return <div className="loading">Carregando…</div>
   }
 
-  if (!isAuthenticated) {
-    if (path === '/signup') {
-      return <Signup />
-    }
-    return <Login />
+  if (isAuthenticated) {
+    return <Navigate to="/map" replace />
   }
 
-  switch (path) {
-    case '/chats':
-      return <ChatPage />
-    case '/profile':
-      return <ProfilePage />
-    default:
-      return <MapPage />
-  }
+  return children
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/chats" element={<ChatPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App

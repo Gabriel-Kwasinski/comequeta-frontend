@@ -1,4 +1,3 @@
-import Navigation from '../NavigationBar/Navigation.tsx'
 import { useAuth } from '../../auth/AuthContext'
 
 function ProfilePage() {
@@ -6,7 +5,6 @@ function ProfilePage() {
 
   return (
     <div>
-      <Navigation />
       <h1>Perfil</h1>
       {user && (
         <p>

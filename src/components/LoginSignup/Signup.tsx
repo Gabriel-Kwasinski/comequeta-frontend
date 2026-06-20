@@ -1,9 +1,11 @@
 import { type FormEvent, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import './Signup.css'
 
 function Signup() {
   const { register } = useAuth()
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -21,7 +23,7 @@ function Signup() {
     setIsSubmitting(true)
     try {
       await register(email, name, password)
-      window.location.href = '/map'
+      navigate('/map')
     } catch {
       setError('Não foi possível criar a conta. O email já pode estar em uso.')
     } finally {
@@ -89,7 +91,7 @@ function Signup() {
       </div>
       <div className="register">
         Ja tem uma conta?
-        <a className="login-btn" href="/"> Entrar</a>
+        <Link className="login-btn" to="/"> Entrar</Link>
       </div>
     </form>
   )
