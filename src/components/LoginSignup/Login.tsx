@@ -150,6 +150,21 @@ function Login() {
           {isSubmitting ? 'Entrando…' : 'Entrar'}
         </Button>
       </div>
+      {/* SCRUM-18: placeholder de login social — OAuth ainda não implementado. */}
+      <div className="oauth-container">
+        <Button
+          type="button"
+          variant="outline"
+          pill
+          fullWidth
+          title="Em breve"
+          onClick={() =>
+            toast?.info('Login com Google estará disponível em breve.')
+          }
+        >
+          Continuar com Google
+        </Button>
+      </div>
       <div className="register">
         Nao tem uma conta?
         <Link className="register-btn" to="/signup">

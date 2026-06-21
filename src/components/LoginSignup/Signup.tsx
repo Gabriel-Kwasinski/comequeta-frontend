@@ -259,6 +259,21 @@ function Signup() {
           {isSubmitting ? 'Criando…' : 'Criar Conta'}
         </Button>
       </div>
+      {/* SCRUM-18: placeholder de cadastro social — OAuth ainda não implementado. */}
+      <div className="oauth-container">
+        <Button
+          type="button"
+          variant="outline"
+          pill
+          fullWidth
+          title="Em breve"
+          onClick={() =>
+            toast?.info('Cadastro com Google estará disponível em breve.')
+          }
+        >
+          Continuar com Google
+        </Button>
+      </div>
       <div className="register">
         Ja tem uma conta?
         <Link className="login-btn" to="/">

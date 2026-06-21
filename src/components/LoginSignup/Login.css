@@ -148,3 +148,7 @@
   font-size: var(--ds-font-size-sm);
   color: var(--ds-gray-700);
 }
+
+.oauth-container {
+  margin-top: var(--ds-space-3);
+}
