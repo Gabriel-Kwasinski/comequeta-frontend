@@ -9,7 +9,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    // Boots (or reuses) the real FastAPI backend for the auth integration tests.
+    globalSetup: './src/test/backend.ts',
     css: false,
+    // Real network round-trips are slower than mocks; give them headroom.
+    testTimeout: 20_000,
     exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/**'],
   },
 })

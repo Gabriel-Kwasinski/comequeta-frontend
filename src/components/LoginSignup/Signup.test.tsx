@@ -1,9 +1,9 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getToken } from '../../auth/tokenStorage'
 import { renderWithProviders } from '../../test/renderWithProviders'
-import { resetUserStore, seedUser, userStore } from '../../test/handlers'
+import { fetchMe, registerUser, uniqueEmail } from '../../test/api'
 import Signup from './Signup'
 
 // Navigation now goes through react-router's useNavigate; spy on it.
@@ -15,12 +15,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
 })
 
 beforeEach(() => {
-  resetUserStore()
   mockNavigate.mockClear()
-})
-
-afterEach(() => {
-  vi.restoreAllMocks()
 })
 
 function fields() {
@@ -33,35 +28,38 @@ function fields() {
   }
 }
 
-describe('Signup flow', () => {
+// These tests run against the REAL backend (booted by the vitest globalSetup).
+describe('Signup flow (real backend)', () => {
   it('cria conta com dados válidos, persiste o usuário, autentica e redireciona', async () => {
     const user = userEvent.setup()
+    const email = uniqueEmail('signup-ok')
+
     renderWithProviders(<Signup />)
     const f = fields()
 
     await user.type(f.name, 'Bruno')
-    await user.type(f.email, 'bruno@example.com')
+    await user.type(f.email, email)
     await user.type(f.password, 'senha-super-1')
     await user.type(f.confirm, 'senha-super-1')
     await user.click(f.submit)
 
-    // Account persisted by the (mocked) backend...
-    await waitFor(() => expect(userStore.has('bruno@example.com')).toBe(true))
-    const stored = userStore.get('bruno@example.com')
-    expect(stored).toMatchObject({ email: 'bruno@example.com', name: 'Bruno' })
-
-    // ...and the user is authenticated (token set) and redirected.
+    // Authenticated (real JWT persisted) and redirected.
     await waitFor(() => expect(getToken()).not.toBeNull())
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/map'))
+
+    // The account was actually persisted by the backend.
+    const me = await fetchMe(getToken() as string)
+    expect(me).toMatchObject({ email, name: 'Bruno' })
   })
 
   it('não cria conta quando as senhas não coincidem e mostra erro no formulário', async () => {
     const user = userEvent.setup()
+
     renderWithProviders(<Signup />)
     const f = fields()
 
     await user.type(f.name, 'Bruno')
-    await user.type(f.email, 'bruno@example.com')
+    await user.type(f.email, uniqueEmail('signup-mismatch'))
     await user.type(f.password, 'senha-super-1')
     await user.type(f.confirm, 'senha-diferente-2')
     await user.click(f.submit)
@@ -69,24 +67,25 @@ describe('Signup flow', () => {
     expect(
       await screen.findByText('As senhas não coincidem.'),
     ).toBeInTheDocument()
-    expect(userStore.has('bruno@example.com')).toBe(false)
     expect(getToken()).toBeNull()
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it('não cria conta com email já em uso e exibe mensagem de erro', async () => {
     const user = userEvent.setup()
-    seedUser({
-      email: 'existe@example.com',
+    const email = uniqueEmail('signup-dup')
+    const res = await registerUser({
+      email,
       name: 'Existente',
       password: 'senha-antiga-1',
     })
+    expect(res.status).toBe(201)
 
     renderWithProviders(<Signup />)
     const f = fields()
 
     await user.type(f.name, 'Outro')
-    await user.type(f.email, 'existe@example.com')
+    await user.type(f.email, email)
     await user.type(f.password, 'senha-nova-9')
     await user.type(f.confirm, 'senha-nova-9')
     await user.click(f.submit)
@@ -99,7 +98,7 @@ describe('Signup flow', () => {
     expect(getToken()).toBeNull()
   })
 
-  it('exige todos os campos obrigatórios (validação nativa)', () => {
+  it('exige todos os campos obrigatórios (atributos do formulário)', () => {
     renderWithProviders(<Signup />)
     const f = fields()
 
@@ -115,23 +114,25 @@ describe('Signup flow', () => {
   it('trata scripts maliciosos no nome como texto comum (sem execução / sem injeção)', async () => {
     const user = userEvent.setup()
     const payload = '<img src=x onerror="window.__xss=true">'
+    const email = uniqueEmail('signup-xss')
 
     renderWithProviders(<Signup />)
     const f = fields()
 
     await user.type(f.name, payload)
-    await user.type(f.email, 'safe@example.com')
+    await user.type(f.email, email)
     await user.type(f.password, 'senha-super-1')
     await user.type(f.confirm, 'senha-super-1')
     await user.click(f.submit)
 
-    await waitFor(() => expect(userStore.has('safe@example.com')).toBe(true))
+    await waitFor(() => expect(getToken()).not.toBeNull())
 
-    // The payload is stored verbatim as plain text, never executed or rendered as HTML.
-    expect(userStore.get('safe@example.com')?.name).toBe(payload)
+    // The backend stored the payload verbatim as plain text (read it back).
+    const me = await fetchMe(getToken() as string)
+    expect(me?.name).toBe(payload)
+    // It never executed, and the input kept the raw string rather than markup.
     expect((window as unknown as { __xss?: boolean }).__xss).toBeUndefined()
     expect(document.querySelector('img[onerror]')).toBeNull()
-    // The input keeps the raw string value rather than interpreting it as markup.
     expect((f.name as HTMLInputElement).value).toBe(payload)
   })
 })
