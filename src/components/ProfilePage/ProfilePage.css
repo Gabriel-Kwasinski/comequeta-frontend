@@ -1,0 +1,72 @@
+.profile-page {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: var(--ds-space-5) var(--ds-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+}
+
+.profile-page__title {
+  font-family: var(--ds-font-heading);
+  font-size: var(--ds-font-size-xl);
+  color: var(--ds-color-text);
+  margin: 0;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-6) var(--ds-space-5);
+  background: var(--ds-color-surface);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-md);
+  text-align: center;
+}
+
+.profile-card__avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--ds-radius-pill);
+  object-fit: cover;
+  border: 3px solid var(--ds-color-primary-soft);
+  background: var(--ds-color-primary-soft);
+}
+
+.profile-card__name {
+  font-family: var(--ds-font-heading);
+  font-size: var(--ds-font-size-lg);
+  color: var(--ds-color-text);
+  margin: 0;
+}
+
+.profile-card__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-muted);
+}
+
+.profile-card__bio {
+  font-size: var(--ds-font-size-md);
+  color: var(--ds-color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.profile-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  width: 100%;
+  margin-top: var(--ds-space-2);
+}
+
+.profile-card__status {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-muted);
+}
