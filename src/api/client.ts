@@ -13,6 +13,8 @@ fetchClient.use({
     if (token) {
       request.headers.set('Authorization', `Bearer ${token}`)
     }
+    // Skip ngrok's browser-warning interstitial when the API is tunneled.
+    request.headers.set('ngrok-skip-browser-warning', 'true')
     return request
   },
   onResponse({ response }) {
