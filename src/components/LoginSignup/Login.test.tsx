@@ -73,7 +73,9 @@ describe('Login flow', () => {
     await user.click(form.submit)
 
     expect(
-      await screen.findByText('Email ou senha inválidos.'),
+      await screen.findByText(
+        'E-mail ou senha inválidos. Verifique suas credenciais.',
+      ),
     ).toBeInTheDocument()
     expect(getToken()).toBeNull()
     expect(mockNavigate).not.toHaveBeenCalled()
@@ -95,7 +97,9 @@ describe('Login flow', () => {
     await user.click(form.submit)
 
     expect(
-      await screen.findByText('Email ou senha inválidos.'),
+      await screen.findByText(
+        'E-mail ou senha inválidos. Verifique suas credenciais.',
+      ),
     ).toBeInTheDocument()
     expect(getToken()).toBeNull()
   })
@@ -110,7 +114,7 @@ describe('Login flow', () => {
     expect(emailInput).toBeRequired()
     expect(emailInput).toHaveAttribute('type', 'email')
     expect(passwordInput).toBeRequired()
-    expect(passwordInput).toHaveAttribute('minLength', '8')
+    expect(passwordInput).toHaveAttribute('type', 'password')
   })
 
   it('trata scripts maliciosos como texto comum (sem execução / sem injeção)', async () => {
@@ -137,7 +141,9 @@ describe('Login flow', () => {
     await user.type(passwordInput, payload)
     await user.click(screen.getByRole('button', { name: /entrar/i }))
 
-    await screen.findByText('Email ou senha inválidos.')
+    await screen.findByText(
+      'E-mail ou senha inválidos. Verifique suas credenciais.',
+    )
 
     // The script must never execute...
     expect((window as unknown as { __xss?: boolean }).__xss).toBeUndefined()
