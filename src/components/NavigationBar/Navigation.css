@@ -46,3 +46,29 @@ html {
 .nav li.active {
   background-color: #555;
 }
+
+.site-logo {
+  height: 60px;
+  width: auto;
+  display: block;
+}
+
+.nav__chats {
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav__badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #e8590c;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

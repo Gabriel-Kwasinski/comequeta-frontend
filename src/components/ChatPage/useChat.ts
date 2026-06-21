@@ -7,6 +7,7 @@
  * history. Inbound socket messages append live and refresh the cache.
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   buildSendFrame,
   deleteConversation as apiDeleteConversation,
@@ -44,6 +45,7 @@ export interface UseChatResult {
 }
 
 export function useChat(currentUserId: number | undefined): UseChatResult {
+  const queryClient = useQueryClient()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedPeer, setSelectedPeer] = useState<number | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -74,24 +76,31 @@ export function useChat(currentUserId: number | undefined): UseChatResult {
   }, [])
 
   // Append an inbound/just-sent message to the active thread + cache.
-  const ingestMessage = useCallback((message: Message) => {
-    const peer = selectedPeerRef.current
-    const threadPeer =
-      message.sender_id === peer || message.recipient_id === peer ? peer : null
+  const ingestMessage = useCallback(
+    (message: Message) => {
+      const peer = selectedPeerRef.current
+      const threadPeer =
+        message.sender_id === peer || message.recipient_id === peer
+          ? peer
+          : null
 
-    if (threadPeer != null) {
-      setMessages((prev) => {
-        const next = mergeMessages(prev, [message])
-        void saveCachedMessages(threadPeer, next)
-        return next
-      })
-    }
+      if (threadPeer != null) {
+        setMessages((prev) => {
+          const next = mergeMessages(prev, [message])
+          void saveCachedMessages(threadPeer, next)
+          return next
+        })
+      }
 
-    // Reflect activity in the conversation list (best-effort refresh).
-    getConversations()
-      .then(setConversations)
-      .catch(() => {})
-  }, [])
+      // Reflect activity in the conversation list (best-effort refresh) and let
+      // the nav unread badge update too.
+      getConversations()
+        .then(setConversations)
+        .catch(() => {})
+      void queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    },
+    [queryClient],
+  )
 
   // Open the WebSocket on mount for real-time delivery.
   useEffect(() => {
@@ -104,39 +113,43 @@ export function useChat(currentUserId: number | undefined): UseChatResult {
   }, [ingestMessage])
 
   // When a peer is selected, seed from cache then load REST history.
-  const selectPeer = useCallback((peerId: number) => {
-    setSelectedPeer(peerId)
-    setLoadingThread(true)
+  const selectPeer = useCallback(
+    (peerId: number) => {
+      setSelectedPeer(peerId)
+      setLoadingThread(true)
 
-    loadCachedMessages(peerId).then((cached) => {
-      // Only seed if this peer is still the active one.
-      if (selectedPeerRef.current === peerId && cached.length) {
-        setMessages(cached)
-      }
-    })
-
-    getMessages(peerId, { limit: 100 })
-      .then((history) => {
-        if (selectedPeerRef.current !== peerId) return
-        const ordered = pruneMessages(history)
-        setMessages(ordered)
-        void saveCachedMessages(peerId, ordered)
-      })
-      .catch(() => {
-        /* keep cached/empty thread on failure */
-      })
-      .finally(() => {
-        if (selectedPeerRef.current === peerId) setLoadingThread(false)
+      loadCachedMessages(peerId).then((cached) => {
+        // Only seed if this peer is still the active one.
+        if (selectedPeerRef.current === peerId && cached.length) {
+          setMessages(cached)
+        }
       })
 
-    markRead(peerId)
-      .then(() => {
-        setConversations((prev) =>
-          prev.map((c) => (c.peer_id === peerId ? { ...c, unread: 0 } : c)),
-        )
-      })
-      .catch(() => {})
-  }, [])
+      getMessages(peerId, { limit: 100 })
+        .then((history) => {
+          if (selectedPeerRef.current !== peerId) return
+          const ordered = pruneMessages(history)
+          setMessages(ordered)
+          void saveCachedMessages(peerId, ordered)
+        })
+        .catch(() => {
+          /* keep cached/empty thread on failure */
+        })
+        .finally(() => {
+          if (selectedPeerRef.current === peerId) setLoadingThread(false)
+        })
+
+      markRead(peerId)
+        .then(() => {
+          setConversations((prev) =>
+            prev.map((c) => (c.peer_id === peerId ? { ...c, unread: 0 } : c)),
+          )
+          void queryClient.invalidateQueries({ queryKey: ['conversations'] })
+        })
+        .catch(() => {})
+    },
+    [queryClient],
+  )
 
   const send = useCallback(
     async (content: string) => {
@@ -165,19 +178,23 @@ export function useChat(currentUserId: number | undefined): UseChatResult {
     [ingestMessage],
   )
 
-  const removeConversation = useCallback(async (peerId: number) => {
-    try {
-      await apiDeleteConversation(peerId)
-    } catch {
-      /* best-effort: still clear it from the UI/cache below */
-    }
-    await clearCachedMessages(peerId)
-    setConversations((prev) => prev.filter((c) => c.peer_id !== peerId))
-    if (selectedPeerRef.current === peerId) {
-      setSelectedPeer(null)
-      setMessages([])
-    }
-  }, [])
+  const removeConversation = useCallback(
+    async (peerId: number) => {
+      try {
+        await apiDeleteConversation(peerId)
+      } catch {
+        /* best-effort: still clear it from the UI/cache below */
+      }
+      await clearCachedMessages(peerId)
+      setConversations((prev) => prev.filter((c) => c.peer_id !== peerId))
+      if (selectedPeerRef.current === peerId) {
+        setSelectedPeer(null)
+        setMessages([])
+      }
+      void queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    },
+    [queryClient],
+  )
 
   return {
     conversations,

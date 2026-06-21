@@ -79,6 +79,7 @@ function Signup() {
 
   return (
     <form className="container" onSubmit={handleSubmit} noValidate>
+      <img src="/logo.png" alt="Comé que Tá" className="auth-logo" />
       <div className="header">
         <div className="text">Signup</div>
         <div className="underline"></div>

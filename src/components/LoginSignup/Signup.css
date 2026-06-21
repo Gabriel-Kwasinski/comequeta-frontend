@@ -146,3 +146,10 @@
 .oauth-container {
   margin-top: var(--ds-space-3);
 }
+
+.auth-logo {
+  display: block;
+  width: 150px;
+  height: auto;
+  margin: 0 auto var(--ds-space-3);
+}
