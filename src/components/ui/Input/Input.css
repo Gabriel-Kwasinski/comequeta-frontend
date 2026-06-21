@@ -21,8 +21,10 @@
   display: flex;
   align-items: center;
   gap: var(--ds-space-2);
-  background: var(--ds-color-surface);
-  border: 1px solid var(--ds-color-border);
+  /* Mirrors the screens' inputs: a soft gray field with a 6px radius and no
+     visible border in the resting state. */
+  background: var(--ds-color-field-bg);
+  border: 1px solid transparent;
   border-radius: var(--ds-radius-md);
   padding: 0 var(--ds-space-3);
   transition:
@@ -43,7 +45,8 @@
   background: transparent;
   font: inherit;
   font-size: var(--ds-font-size-md);
-  color: var(--ds-color-text);
+  /* The screens render input text in the muted gray, not the heading ink. */
+  color: var(--ds-color-text-muted);
   padding: var(--ds-space-3) 0;
 }
 

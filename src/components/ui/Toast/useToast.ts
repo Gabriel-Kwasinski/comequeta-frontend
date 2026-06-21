@@ -19,3 +19,19 @@ export function useToast(): ToastContextValue {
   }
   return ctx
 }
+
+/**
+ * Like {@link useToast}, but returns `null` instead of throwing when no
+ * {@link ToastProvider} is present.
+ *
+ * Useful for screens that surface toast feedback as an enhancement on top of
+ * their own inline messaging: they keep working (without toasts) when rendered
+ * outside a provider, e.g. in isolated tests.
+ *
+ * @example
+ * const toast = useOptionalToast()
+ * toast?.success('Perfil salvo com sucesso!')
+ */
+export function useOptionalToast(): ToastContextValue | null {
+  return useContext(ToastContext)
+}

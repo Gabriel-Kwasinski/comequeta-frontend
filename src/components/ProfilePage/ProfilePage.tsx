@@ -1,4 +1,5 @@
 import { useAuth } from '../../auth/AuthContext'
+import { Button } from '../ui'
 
 function ProfilePage() {
   const { user, logout } = useAuth()
@@ -11,9 +12,9 @@ function ProfilePage() {
           Olá, <strong>{user.name}</strong>! ({user.email})
         </p>
       )}
-      <button type="button" onClick={logout}>
+      <Button type="button" variant="outline" onClick={logout}>
         Sair
-      </button>
+      </Button>
     </div>
   )
 }

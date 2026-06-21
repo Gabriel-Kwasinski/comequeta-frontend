@@ -11,27 +11,30 @@
   /* ---------------------------------------------------------------- */
   /* Color palette (raw)                                              */
   /* ---------------------------------------------------------------- */
+  /* Calibrated against the hand-styled Login/Signup screens so the design
+     system mirrors their existing look (purple palette) instead of imposing
+     its own. */
   --ds-violet-50: #f3ecff;
   --ds-violet-100: #ede6ff;
   --ds-violet-300: #b98bff;
-  --ds-violet-500: #863bff;
-  --ds-violet-600: #7e14ff;
-  --ds-violet-700: #5c0fb8;
-  --ds-violet-900: #3c009d;
+  --ds-violet-500: #4c00b4; /* screens' interactive purple (buttons, links) */
+  --ds-violet-600: #43009f;
+  --ds-violet-700: #3c009d; /* screens' heading/underline purple */
+  --ds-violet-900: #2a00b7;
 
   --ds-blue-400: #47bfff;
 
   --ds-white: #ffffff;
-  --ds-gray-50: #f7f7f8;
-  --ds-gray-100: #eaeaea;
+  --ds-gray-50: #f4f4f4;
+  --ds-gray-100: #eaeaea; /* screens' input background */
   --ds-gray-200: #e5e4e7;
   --ds-gray-400: #9ca3af;
-  --ds-gray-600: #6b6375;
+  --ds-gray-600: #797979; /* screens' input/muted text */
   --ds-gray-900: #08060d;
 
-  --ds-green-500: #1aa251;
+  --ds-green-500: #2e7d32; /* screens' success message green */
   --ds-green-50: #e7f6ee;
-  --ds-red-500: #d92d20;
+  --ds-red-500: #c62828; /* screens' error message red */
   --ds-red-50: #fdeceb;
   --ds-amber-500: #f79009;
   --ds-amber-50: #fff5e6;
@@ -46,6 +49,11 @@
   --ds-color-primary-active: var(--ds-violet-700);
   --ds-color-primary-contrast: var(--ds-white);
   --ds-color-primary-soft: var(--ds-violet-100);
+
+  /* Heading accent (the big "Login"/"Signup" title + underline). */
+  --ds-color-heading: var(--ds-violet-700);
+  /* The screens' inputs sit on a soft gray field, not a white surface. */
+  --ds-color-field-bg: var(--ds-gray-100);
 
   --ds-color-accent: var(--ds-blue-400);
 
@@ -65,13 +73,15 @@
   --ds-color-info: var(--ds-info-500);
   --ds-color-info-soft: var(--ds-info-50);
 
-  --ds-color-focus-ring: rgba(134, 59, 255, 0.4);
+  --ds-color-focus-ring: rgba(76, 0, 180, 0.35);
 
   /* ---------------------------------------------------------------- */
   /* Typography                                                       */
   /* ---------------------------------------------------------------- */
-  --ds-font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
-  --ds-font-heading: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* The screens never pulled a webfont; they render in the system stack.
+     Keep the DS aligned with that so adopted components match exactly. */
+  --ds-font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --ds-font-heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --ds-font-mono: ui-monospace, Consolas, monospace;
 
   --ds-font-size-xs: 0.75rem; /* 12px */
@@ -104,10 +114,12 @@
   /* ---------------------------------------------------------------- */
   /* Radii                                                            */
   /* ---------------------------------------------------------------- */
+  /* Calibrated to the screens: inputs use 6px, the title underline 9px,
+     and the primary buttons are fully rounded pills. */
   --ds-radius-sm: 4px;
-  --ds-radius-md: 8px;
-  --ds-radius-lg: 12px;
-  --ds-radius-pill: 999px;
+  --ds-radius-md: 6px;
+  --ds-radius-lg: 9px;
+  --ds-radius-pill: 50px;
 
   /* ---------------------------------------------------------------- */
   /* Shadows                                                          */

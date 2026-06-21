@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
+import { Button, Input, useOptionalToast } from '../ui'
 import './Signup.css'
 import {
   describeRegisterError,
@@ -21,6 +22,7 @@ interface FieldErrors {
 function Signup() {
   const { register } = useAuth()
   const navigate = useNavigate()
+  const toast = useOptionalToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -58,9 +60,12 @@ function Signup() {
     try {
       await register(email, name, password)
       setIsSuccess(true)
+      toast?.success('Conta criada com sucesso! Redirecionando…')
       navigate('/map')
     } catch (error) {
-      setFormError(describeRegisterError(error))
+      const message = describeRegisterError(error)
+      setFormError(message)
+      toast?.error(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -74,7 +79,8 @@ function Signup() {
       </div>
       <div className="inputs">
         <div className="input">
-          <input
+          <Input
+            bare
             type="text"
             placeholder="Nome completo"
             value={name}
@@ -84,7 +90,7 @@ function Signup() {
             }
             aria-label="Nome completo"
             aria-required="true"
-            aria-invalid={!!fieldErrors.name}
+            invalid={!!fieldErrors.name}
             aria-describedby={
               fieldErrors.name ? 'signup-name-error' : undefined
             }
@@ -99,7 +105,8 @@ function Signup() {
       </div>
       <div className="inputs">
         <div className="input">
-          <input
+          <Input
+            bare
             type="email"
             placeholder="Email"
             value={email}
@@ -112,7 +119,7 @@ function Signup() {
             }
             aria-label="E-mail"
             aria-required="true"
-            aria-invalid={!!fieldErrors.email}
+            invalid={!!fieldErrors.email}
             aria-describedby={
               fieldErrors.email ? 'signup-email-error' : undefined
             }
@@ -127,7 +134,8 @@ function Signup() {
       </div>
       <div className="inputs">
         <div className="input">
-          <input
+          <Input
+            bare
             type="password"
             placeholder="Senha"
             value={password}
@@ -140,7 +148,7 @@ function Signup() {
             }
             aria-label="Senha"
             aria-required="true"
-            aria-invalid={!!fieldErrors.password}
+            invalid={!!fieldErrors.password}
             aria-describedby={
               fieldErrors.password
                 ? 'signup-password-error'
@@ -161,7 +169,8 @@ function Signup() {
       </div>
       <div className="inputs">
         <div className="input">
-          <input
+          <Input
+            bare
             type="password"
             placeholder="Confirmar senha"
             value={confirmPassword}
@@ -177,7 +186,7 @@ function Signup() {
             }
             aria-label="Confirmar senha"
             aria-required="true"
-            aria-invalid={!!fieldErrors.confirmPassword}
+            invalid={!!fieldErrors.confirmPassword}
             aria-describedby={
               fieldErrors.confirmPassword ? 'signup-confirm-error' : undefined
             }
@@ -201,13 +210,15 @@ function Signup() {
         </p>
       )}
       <div className="submit-container">
-        <button
+        <Button
           className="submit"
+          variant="primary"
+          pill
           type="submit"
           disabled={isSubmitting || isSuccess}
         >
           {isSubmitting ? 'Criando…' : 'Criar Conta'}
-        </button>
+        </Button>
       </div>
       <div className="register">
         Ja tem uma conta?
