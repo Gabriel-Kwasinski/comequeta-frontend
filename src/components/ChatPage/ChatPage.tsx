@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import { Button } from '../ui/Button/Button'
 import { Input } from '../ui/Input/Input'
+import { getUsers, type ChatUser } from './chatApi'
 import { useChat } from './useChat'
 import './ChatPage.css'
 
@@ -18,21 +19,28 @@ function ChatPage() {
     send,
   } = useChat(user?.id)
 
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [draft, setDraft] = useState('')
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
-  // Deep link: /chats?peer=<id> opens a thread with a specific neighbour
-  // (e.g. the "iniciar conversa" button on a neighbour profile).
+  // "Nova conversa" picker state.
+  const [showPicker, setShowPicker] = useState(false)
+  const [allUsers, setAllUsers] = useState<ChatUser[]>([])
+  const [usersLoaded, setUsersLoaded] = useState(false)
+
+  // Both the profile "Conversar" deep link and the "Nova conversa" picker put
+  // the target in the URL (?peer=<id>&name=<name>). This effect depends only on
+  // `peerParam` (NOT `selectedPeer`), so it applies the peer when the link
+  // changes but never fights the user manually switching conversations.
   const peerParam = searchParams.get('peer')
   const nameParam = searchParams.get('name')
   useEffect(() => {
     if (!peerParam) return
     const peerId = Number(peerParam)
-    if (Number.isFinite(peerId) && peerId !== selectedPeer) {
+    if (Number.isFinite(peerId)) {
       selectPeer(peerId)
     }
-  }, [peerParam, selectedPeer, selectPeer])
+  }, [peerParam, selectPeer])
 
   // Keep the thread scrolled to the latest message.
   useEffect(() => {
@@ -42,9 +50,37 @@ function ChatPage() {
   const activeName = useMemo(() => {
     const conv = conversations.find((c) => c.peer_id === selectedPeer)
     if (conv) return conv.peer_name
-    if (nameParam) return nameParam
+    if (
+      selectedPeer != null &&
+      nameParam &&
+      Number(peerParam) === selectedPeer
+    ) {
+      return nameParam
+    }
     return selectedPeer != null ? `Vizinho #${selectedPeer}` : ''
-  }, [conversations, selectedPeer, nameParam])
+  }, [conversations, selectedPeer, peerParam, nameParam])
+
+  function openPicker() {
+    setShowPicker(true)
+    if (!usersLoaded) {
+      getUsers()
+        .then((users) => {
+          setAllUsers(users)
+          setUsersLoaded(true)
+        })
+        .catch(() => {
+          /* keep empty list on failure */
+        })
+    }
+  }
+
+  function startChat(picked: ChatUser) {
+    setShowPicker(false)
+    // Drive selection through the URL (so the header name resolves) and also
+    // select directly so re-picking the same user still works.
+    setSearchParams({ peer: String(picked.id), name: picked.name })
+    selectPeer(picked.id)
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -57,12 +93,45 @@ function ChatPage() {
   return (
     <div className="chat-page">
       <aside className="chat-list">
-        <h1 className="chat-list__title">Conversas</h1>
+        <div className="chat-list__head">
+          <h1 className="chat-list__title">Conversas</h1>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => (showPicker ? setShowPicker(false) : openPicker())}
+          >
+            {showPicker ? 'Fechar' : 'Nova conversa'}
+          </Button>
+        </div>
+
+        {showPicker && (
+          <div className="chat-picker">
+            {allUsers.length === 0 ? (
+              <p className="chat-list__empty">
+                Nenhum outro usuário cadastrado ainda.
+              </p>
+            ) : (
+              allUsers.map((u) => (
+                <button
+                  key={u.id}
+                  type="button"
+                  className="chat-list__item"
+                  onClick={() => startChat(u)}
+                >
+                  <span className="chat-list__name">{u.name}</span>
+                  <span className="chat-list__preview">{u.email}</span>
+                </button>
+              ))
+            )}
+          </div>
+        )}
+
         <div className="chat-list__items">
           {conversations.length === 0 ? (
             <p className="chat-list__empty">
-              Você ainda não tem conversas. Visite o perfil de um vizinho para
-              iniciar uma conversa.
+              Você ainda não tem conversas. Use “Nova conversa” para falar com
+              alguém.
             </p>
           ) : (
             conversations.map((conv) => (
