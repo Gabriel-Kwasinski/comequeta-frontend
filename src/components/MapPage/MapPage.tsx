@@ -12,6 +12,7 @@ import 'leaflet/dist/leaflet.css'
 import { Link } from 'react-router-dom'
 import './MapPage.css'
 import type { LatLng } from './geo'
+import { updateMyLocation } from './mapApi'
 import { useGeolocation } from './useGeolocation'
 import { useNearbyUsers } from './useNearbyUsers'
 
@@ -68,6 +69,12 @@ function MapPage() {
   const [radiusMeters, setRadiusMeters] = useState<number>(DEFAULT_RADIUS_M)
 
   const { users } = useNearbyUsers(center, radiusMeters)
+
+  // Report our position so other users' maps can find us (US03/US04). Two
+  // accounts in the same place (same device/geolocation) thus see each other.
+  useEffect(() => {
+    void updateMyLocation(center.lat, center.lng)
+  }, [center.lat, center.lng])
 
   return (
     <div className="map-page">

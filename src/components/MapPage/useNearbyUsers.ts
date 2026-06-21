@@ -1,12 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
 import type { LatLng } from './geo'
+import { getNearbyUsers } from './mapApi'
 
-/**
- * A neighbour shown on the proximity map.
- *
- * The shape mirrors what a future `/users/nearby` endpoint would return (id,
- * name, coordinates, optional avatar) so it can be wired to a real `$api` query
- * with minimal churn at the call sites.
- */
+/** A neighbour shown on the proximity map (a real registered account). */
 export interface NearbyUser {
   id: number
   name: string
@@ -16,30 +12,34 @@ export interface NearbyUser {
 }
 
 interface UseNearbyUsersResult {
-  /** Neighbours within `radiusMeters` of `center`, nearest first. */
+  /** Real users within `radiusMeters` of `center`. */
   users: NearbyUser[]
   isLoading: boolean
   error: Error | null
 }
 
+/** How often to refresh nearby users so newly-arrived people show up. */
+const REFRESH_MS = 8000
+
 /**
- * Returns nearby users within `radiusMeters` of `center`.
- *
- * Currently returns NO users on purpose: the previous mock neighbours had fixed
- * ids (1..6) that collided with real account ids, so tapping one opened a chat
- * with a real account (e.g. yourself). Showing fake people that link to real
- * conversations is misleading, so the mock was removed.
- *
- * TODO(backend): real nearby users require an endpoint that stores user
- * locations (e.g. `GET /users/nearby?lat=&lng=&radius=`). Once it exists,
- * replace this body with an `$api`/fetch query and keep the
- * `NearbyUser`/`UseNearbyUsersResult` contract so consumers stay unchanged.
- * Until then, start conversations from the chat's "Nova conversa" picker
- * (backed by `GET /users`).
+ * Returns real users near `center` within `radiusMeters`, from
+ * `GET /users/nearby`. Each user reports their own position when they open the
+ * map (see MapPage), so two accounts in the same place see each other. Refetches
+ * periodically so a peer who opens the app afterwards appears without a reload.
  */
 export function useNearbyUsers(
-  _center: LatLng,
-  _radiusMeters: number,
+  center: LatLng,
+  radiusMeters: number,
 ): UseNearbyUsersResult {
-  return { users: [], isLoading: false, error: null }
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['nearby-users', center.lat, center.lng, radiusMeters],
+    queryFn: () => getNearbyUsers(center.lat, center.lng, radiusMeters),
+    refetchInterval: REFRESH_MS,
+  })
+
+  return {
+    users: data ?? [],
+    isLoading,
+    error: error instanceof Error ? error : null,
+  }
 }

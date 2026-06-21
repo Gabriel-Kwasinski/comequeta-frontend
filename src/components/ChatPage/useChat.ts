@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   buildSendFrame,
+  deleteConversation as apiDeleteConversation,
   getConversations,
   getMessages,
   markRead,
@@ -18,6 +19,7 @@ import {
   type Message,
 } from './chatApi'
 import {
+  clearCachedMessages,
   loadCachedMessages,
   pruneMessages,
   saveCachedMessages,
@@ -38,6 +40,7 @@ export interface UseChatResult {
   loadingThread: boolean
   selectPeer: (peerId: number) => void
   send: (content: string) => Promise<void>
+  removeConversation: (peerId: number) => Promise<void>
 }
 
 export function useChat(currentUserId: number | undefined): UseChatResult {
@@ -162,6 +165,20 @@ export function useChat(currentUserId: number | undefined): UseChatResult {
     [ingestMessage],
   )
 
+  const removeConversation = useCallback(async (peerId: number) => {
+    try {
+      await apiDeleteConversation(peerId)
+    } catch {
+      /* best-effort: still clear it from the UI/cache below */
+    }
+    await clearCachedMessages(peerId)
+    setConversations((prev) => prev.filter((c) => c.peer_id !== peerId))
+    if (selectedPeerRef.current === peerId) {
+      setSelectedPeer(null)
+      setMessages([])
+    }
+  }, [])
+
   return {
     conversations,
     selectedPeer,
@@ -170,5 +187,6 @@ export function useChat(currentUserId: number | undefined): UseChatResult {
     loadingThread,
     selectPeer,
     send,
+    removeConversation,
   }
 }
