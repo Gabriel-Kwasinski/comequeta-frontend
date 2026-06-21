@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import { Button } from '../ui/Button/Button'
 import { Input } from '../ui/Input/Input'
-import { getUsers, type ChatUser } from './chatApi'
 import { useChat } from './useChat'
 import './ChatPage.css'
 
@@ -17,21 +16,17 @@ function ChatPage() {
     loadingThread,
     selectPeer,
     send,
+    removeConversation,
   } = useChat(user?.id)
 
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const [draft, setDraft] = useState('')
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
-  // "Nova conversa" picker state.
-  const [showPicker, setShowPicker] = useState(false)
-  const [allUsers, setAllUsers] = useState<ChatUser[]>([])
-  const [usersLoaded, setUsersLoaded] = useState(false)
-
-  // Both the profile "Conversar" deep link and the "Nova conversa" picker put
-  // the target in the URL (?peer=<id>&name=<name>). This effect depends only on
-  // `peerParam` (NOT `selectedPeer`), so it applies the peer when the link
-  // changes but never fights the user manually switching conversations.
+  // Conversations are started from the map (profile "Conversar" deep link):
+  // /chats?peer=<id>&name=<name>. This effect depends only on `peerParam` (NOT
+  // `selectedPeer`), so it applies the link once and never fights the user
+  // manually switching between conversations.
   const peerParam = searchParams.get('peer')
   const nameParam = searchParams.get('name')
   useEffect(() => {
@@ -60,28 +55,6 @@ function ChatPage() {
     return selectedPeer != null ? `Vizinho #${selectedPeer}` : ''
   }, [conversations, selectedPeer, peerParam, nameParam])
 
-  function openPicker() {
-    setShowPicker(true)
-    if (!usersLoaded) {
-      getUsers()
-        .then((users) => {
-          setAllUsers(users)
-          setUsersLoaded(true)
-        })
-        .catch(() => {
-          /* keep empty list on failure */
-        })
-    }
-  }
-
-  function startChat(picked: ChatUser) {
-    setShowPicker(false)
-    // Drive selection through the URL (so the header name resolves) and also
-    // select directly so re-picking the same user still works.
-    setSearchParams({ peer: String(picked.id), name: picked.name })
-    selectPeer(picked.id)
-  }
-
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const content = draft.trim()
@@ -90,48 +63,21 @@ function ChatPage() {
     void send(content)
   }
 
+  function handleDelete() {
+    if (selectedPeer != null && window.confirm('Apagar esta conversa?')) {
+      void removeConversation(selectedPeer)
+    }
+  }
+
   return (
     <div className="chat-page">
       <aside className="chat-list">
-        <div className="chat-list__head">
-          <h1 className="chat-list__title">Conversas</h1>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => (showPicker ? setShowPicker(false) : openPicker())}
-          >
-            {showPicker ? 'Fechar' : 'Nova conversa'}
-          </Button>
-        </div>
-
-        {showPicker && (
-          <div className="chat-picker">
-            {allUsers.length === 0 ? (
-              <p className="chat-list__empty">
-                Nenhum outro usuário cadastrado ainda.
-              </p>
-            ) : (
-              allUsers.map((u) => (
-                <button
-                  key={u.id}
-                  type="button"
-                  className="chat-list__item"
-                  onClick={() => startChat(u)}
-                >
-                  <span className="chat-list__name">{u.name}</span>
-                  <span className="chat-list__preview">{u.email}</span>
-                </button>
-              ))
-            )}
-          </div>
-        )}
-
+        <h1 className="chat-list__title">Conversas</h1>
         <div className="chat-list__items">
           {conversations.length === 0 ? (
             <p className="chat-list__empty">
-              Você ainda não tem conversas. Use “Nova conversa” para falar com
-              alguém.
+              Você ainda não tem conversas. Encontre alguém no mapa, abra o
+              perfil e toque em “Conversar”.
             </p>
           ) : (
             conversations.map((conv) => (
@@ -172,7 +118,17 @@ function ChatPage() {
           </div>
         ) : (
           <>
-            <header className="chat-thread__header">{activeName}</header>
+            <header className="chat-thread__header">
+              <span className="chat-thread__title">{activeName}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleDelete}
+              >
+                Apagar conversa
+              </Button>
+            </header>
             <div className="chat-thread__messages">
               {messages.length === 0 && !loadingThread ? (
                 <div className="chat-thread__empty">

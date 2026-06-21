@@ -13,7 +13,18 @@ import { useNeighborProfile } from './useNeighborProfile'
 function NeighborProfilePage() {
   const { id } = useParams<{ id: string }>()
   const numericId = Number(id)
-  const { profile, isError } = useNeighborProfile(numericId)
+  const { profile, isLoading, isError } = useNeighborProfile(numericId)
+
+  if (isLoading) {
+    return (
+      <div className="profile-page">
+        <h1 className="profile-page__title">Perfil do vizinho</h1>
+        <section className="profile-card" aria-label="Carregando perfil">
+          <p className="profile-card__status">Carregando…</p>
+        </section>
+      </div>
+    )
+  }
 
   if (isError || !profile) {
     return (

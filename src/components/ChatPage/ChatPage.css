@@ -108,7 +108,11 @@
 }
 
 .chat-thread__header {
-  padding: var(--ds-space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-3) var(--ds-space-4);
   font-weight: var(--ds-font-weight-semibold);
   color: var(--ds-color-heading);
   border-bottom: 1px solid var(--ds-color-border);
@@ -175,27 +179,8 @@
   }
 }
 
-/* Header row with the "Nova conversa" action. */
-.chat-list__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-bottom: 1px solid var(--ds-color-border);
-}
-
-.chat-list__head .chat-list__title {
-  padding: 0;
-  border: none;
-}
-
-/* "Nova conversa" user picker. */
-.chat-picker {
-  display: flex;
-  flex-direction: column;
-  max-height: 45%;
-  overflow-y: auto;
-  border-bottom: 1px solid var(--ds-color-border);
-  background: var(--ds-color-bg);
+.chat-thread__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -49,3 +49,12 @@ export async function saveCachedMessages(
     // Best-effort cache; a failure here must never break the chat UI.
   }
 }
+
+/** Drop a conversation's cached messages (e.g. when it is deleted). */
+export async function clearCachedMessages(peerId: number): Promise<void> {
+  try {
+    await Preferences.remove({ key: cacheKey(peerId) })
+  } catch {
+    // Best-effort.
+  }
+}

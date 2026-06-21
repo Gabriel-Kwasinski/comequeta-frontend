@@ -98,6 +98,11 @@ export function markRead(peerId: number): Promise<void> {
   return request<void>(`/chat/messages/${peerId}/read`, { method: 'POST' })
 }
 
+/** Delete the whole conversation with `peerId` (clears it from the sidebar). */
+export function deleteConversation(peerId: number): Promise<void> {
+  return request<void>(`/chat/messages/${peerId}`, { method: 'DELETE' })
+}
+
 /**
  * Open the chat WebSocket and invoke `onMessage` for each inbound message.
  * Derives ws/wss + host from `VITE_API_URL` and authenticates via query token.
