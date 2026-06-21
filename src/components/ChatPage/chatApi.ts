@@ -20,6 +20,13 @@ export interface Conversation {
   unread: number
 }
 
+/** A registered account that can be chatted with (from `GET /users`). */
+export interface ChatUser {
+  id: number
+  name: string
+  email: string
+}
+
 /** Inbound WebSocket frame (server → client). */
 interface MessageFrame {
   type: 'message'
@@ -53,6 +60,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 /** List the current user's conversations, most-recent activity first. */
 export function getConversations(): Promise<Conversation[]> {
   return request<Conversation[]>('/chat/conversations')
+}
+
+/** List other registered accounts, to start a new conversation. */
+export function getUsers(): Promise<ChatUser[]> {
+  return request<ChatUser[]>('/users')
 }
 
 /**

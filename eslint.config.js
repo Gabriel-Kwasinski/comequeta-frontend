@@ -19,6 +19,14 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Allow intentionally-unused args/vars prefixed with `_` (e.g. params
+      // kept to satisfy a function signature).
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
   },
   eslintConfigPrettier,
 ])
