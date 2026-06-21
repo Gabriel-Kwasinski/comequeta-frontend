@@ -1,0 +1,29 @@
+.terms-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--ds-space-5) var(--ds-space-4);
+  color: var(--ds-gray-900);
+  line-height: 1.6;
+}
+
+.terms-page h1 {
+  color: var(--ds-color-primary);
+}
+
+.terms-page__draft {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-gray-600);
+  font-style: italic;
+}
+
+.terms-page section {
+  margin-top: var(--ds-space-4);
+}
+
+.terms-page h2 {
+  font-size: var(--ds-font-size-lg);
+}
+
+.terms-page__back {
+  margin-top: var(--ds-space-5);
+}

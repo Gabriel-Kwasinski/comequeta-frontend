@@ -5,6 +5,7 @@ import Layout from './components/Layout/Layout.tsx'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx'
 import Login from './components/LoginSignup/Login.tsx'
 import Signup from './components/LoginSignup/Signup.tsx'
+import TermsPage from './components/TermsPage/TermsPage.tsx'
 import MapPage from './components/MapPage/MapPage.tsx'
 import ChatPage from './components/ChatPage/ChatPage.tsx'
 import ProfilePage from './components/ProfilePage/ProfilePage.tsx'
@@ -44,6 +45,7 @@ function App() {
             </PublicRoute>
           }
         />
+        <Route path="/termos" element={<TermsPage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/map" element={<MapPage />} />

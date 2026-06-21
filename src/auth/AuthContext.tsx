@@ -17,7 +17,7 @@ interface AuthContextValue {
   user?: User
   isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, remember?: boolean) => Promise<void>
   register: (email: string, name: string, password: string) => Promise<void>
   logout: () => void
 }
@@ -47,12 +47,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [hasToken, meQuery.isError])
 
   const login = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string, remember = true) => {
       const result = await loginMutation.mutateAsync({
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: { username: email, password, grant_type: 'password', scope: '' },
       })
-      setToken(result.access_token)
+      setToken(result.access_token, remember)
       setHasToken(true)
       await queryClient.invalidateQueries({ queryKey: ['get', '/users/me'] })
     },
