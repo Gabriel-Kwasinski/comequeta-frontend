@@ -24,6 +24,7 @@ function fields() {
     email: screen.getByPlaceholderText('Email'),
     password: screen.getByPlaceholderText('Senha'),
     confirm: screen.getByPlaceholderText('Confirmar senha'),
+    terms: screen.getByRole('checkbox', { name: /termos/i }),
     submit: screen.getByRole('button', { name: /criar conta/i }),
   }
 }
@@ -41,6 +42,7 @@ describe('Signup flow (real backend)', () => {
     await user.type(f.email, email)
     await user.type(f.password, 'senha-super-1')
     await user.type(f.confirm, 'senha-super-1')
+    await user.click(f.terms)
     await user.click(f.submit)
 
     // Authenticated (real JWT persisted) and redirected.
@@ -88,6 +90,7 @@ describe('Signup flow (real backend)', () => {
     await user.type(f.email, email)
     await user.type(f.password, 'senha-nova-9')
     await user.type(f.confirm, 'senha-nova-9')
+    await user.click(f.terms)
     await user.click(f.submit)
 
     expect(
@@ -96,6 +99,26 @@ describe('Signup flow (real backend)', () => {
       ),
     ).toBeInTheDocument()
     expect(getToken()).toBeNull()
+  })
+
+  it('não cria conta sem aceitar os termos de uso', async () => {
+    const user = userEvent.setup()
+
+    renderWithProviders(<Signup />)
+    const f = fields()
+
+    await user.type(f.name, 'Bruno')
+    await user.type(f.email, uniqueEmail('signup-noterms'))
+    await user.type(f.password, 'senha-super-1')
+    await user.type(f.confirm, 'senha-super-1')
+    // Terms checkbox intentionally left unchecked.
+    await user.click(f.submit)
+
+    expect(
+      await screen.findByText(/aceitar os Termos de Uso/i),
+    ).toBeInTheDocument()
+    expect(getToken()).toBeNull()
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it('exige todos os campos obrigatórios (atributos do formulário)', () => {
@@ -123,6 +146,7 @@ describe('Signup flow (real backend)', () => {
     await user.type(f.email, email)
     await user.type(f.password, 'senha-super-1')
     await user.type(f.confirm, 'senha-super-1')
+    await user.click(f.terms)
     await user.click(f.submit)
 
     await waitFor(() => expect(getToken()).not.toBeNull())

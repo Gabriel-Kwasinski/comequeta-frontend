@@ -128,3 +128,17 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-gray-700);
+  text-align: left;
+}
+
+.terms a {
+  color: var(--ds-color-primary);
+  font-weight: var(--ds-font-weight-medium);
+}

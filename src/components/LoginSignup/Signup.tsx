@@ -17,6 +17,7 @@ interface FieldErrors {
   email?: string
   password?: string
   confirmPassword?: string
+  terms?: string
 }
 
 function Signup() {
@@ -27,6 +28,7 @@ function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string>()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -38,6 +40,9 @@ function Signup() {
       email: validateEmail(email),
       password: validatePassword(password),
       confirmPassword: validateConfirmPassword(password, confirmPassword),
+      terms: acceptedTerms
+        ? undefined
+        : 'Você precisa aceitar os Termos de Uso para criar a conta.',
     }
   }
 
@@ -51,7 +56,8 @@ function Signup() {
       errors.name ||
       errors.email ||
       errors.password ||
-      errors.confirmPassword
+      errors.confirmPassword ||
+      errors.terms
     ) {
       return
     }
@@ -196,6 +202,39 @@ function Signup() {
         {fieldErrors.confirmPassword && (
           <p id="signup-confirm-error" className="field-error" role="alert">
             {fieldErrors.confirmPassword}
+          </p>
+        )}
+      </div>
+      <div className="inputs">
+        <label className="terms">
+          <input
+            type="checkbox"
+            checked={acceptedTerms}
+            onChange={(e) => {
+              setAcceptedTerms(e.target.checked)
+              setFieldErrors((prev) => ({
+                ...prev,
+                terms: e.target.checked
+                  ? undefined
+                  : 'Você precisa aceitar os Termos de Uso para criar a conta.',
+              }))
+            }}
+            aria-required="true"
+            aria-invalid={!!fieldErrors.terms}
+            aria-describedby={
+              fieldErrors.terms ? 'signup-terms-error' : undefined
+            }
+          />
+          <span>
+            Li e aceito os{' '}
+            <Link to="/termos" target="_blank" rel="noreferrer">
+              Termos de Uso
+            </Link>
+          </span>
+        </label>
+        {fieldErrors.terms && (
+          <p id="signup-terms-error" className="field-error" role="alert">
+            {fieldErrors.terms}
           </p>
         )}
       </div>

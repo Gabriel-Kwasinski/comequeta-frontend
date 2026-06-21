@@ -16,6 +16,7 @@ function Login() {
   const toast = useOptionalToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string>()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -40,7 +41,7 @@ function Login() {
 
     setIsSubmitting(true)
     try {
-      await login(email, password)
+      await login(email, password, remember)
       setIsSuccess(true)
       toast?.success('Login realizado! Redirecionando…')
       navigate('/map')
@@ -117,6 +118,14 @@ function Login() {
           </p>
         )}
       </div>
+      <label className="remember-me">
+        <input
+          type="checkbox"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+        />
+        <span>Lembrar de mim</span>
+      </label>
       <div className="forgot-password">
         <span> Esqueci minha senha</span>
       </div>

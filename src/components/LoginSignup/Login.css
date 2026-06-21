@@ -139,3 +139,12 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-2);
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-gray-700);
+}
