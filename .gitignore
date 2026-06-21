@@ -26,3 +26,8 @@ openapi.json
 
 # Claude Code worktrees/agent state
 .claude/
+
+# Local env files (keep .env.example tracked)
+.env
+.env.*
+!.env.example
