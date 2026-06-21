@@ -1,29 +1,59 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
-import Signup from './components/LoginSignup/Signup.jsx'
-import Login from './components/LoginSignup/Login.jsx'
-import MapPage from './components/MapPage/MapPage.jsx'
-import ChatPage from './components/ChatPage/ChatPage.jsx'
-import ProfilePage from './components/ProfilePage/ProfilePage.jsx'
+import { useAuth } from './auth/AuthContext'
+import Layout from './components/Layout/Layout.tsx'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx'
+import Login from './components/LoginSignup/Login.tsx'
+import Signup from './components/LoginSignup/Signup.tsx'
+import MapPage from './components/MapPage/MapPage.tsx'
+import ChatPage from './components/ChatPage/ChatPage.tsx'
+import ProfilePage from './components/ProfilePage/ProfilePage.tsx'
+
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth()
+
+  if (isLoading) {
+    return <div className="loading">Carregando…</div>
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/map" replace />
+  }
+
+  return children
+}
 
 function App() {
-  let component = <Login></Login>
-
-  console.log(window.location)
-  switch (window.location.pathname) {
-    case '/signup':
-      component = <Signup></Signup>
-      break
-    case '/map':
-      component = <MapPage></MapPage>
-      break
-    case '/chats':
-      component = <ChatPage></ChatPage>
-      break
-    case '/profile':
-      component = <ProfilePage></ProfilePage>
-      break
-  }
-  return component
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/chats" element={<ChatPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App

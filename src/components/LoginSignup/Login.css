@@ -103,3 +103,39 @@
   color: #4c00b4;
   cursor: pointer;
 }
+.field-error {
+  margin: 6px auto 0;
+  width: 480px;
+  color: #c62828;
+  font-size: 15px;
+}
+
+.field-hint {
+  margin: 6px auto 0;
+  width: 480px;
+  color: #797979;
+  font-size: 14px;
+}
+
+.auth-error {
+  margin: 20px auto 0;
+  width: 480px;
+  color: #c62828;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.auth-success {
+  margin: 20px auto 0;
+  width: 480px;
+  color: #2e7d32;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

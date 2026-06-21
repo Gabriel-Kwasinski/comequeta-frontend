@@ -1,0 +1,10 @@
+{
+  "appId": "dev.pages.comequeta",
+  "appName": "Comé que Tá",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  }
+}

@@ -1,0 +1,93 @@
+.ds-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-weight: var(--ds-font-weight-semibold);
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius-md);
+  cursor: pointer;
+  transition:
+    background var(--ds-transition-fast),
+    color var(--ds-transition-fast),
+    border-color var(--ds-transition-fast),
+    box-shadow var(--ds-transition-fast);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.ds-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ds-color-focus-ring);
+}
+
+.ds-button:disabled,
+.ds-button[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.ds-button--sm {
+  font-size: var(--ds-font-size-sm);
+  padding: var(--ds-space-2) var(--ds-space-3);
+}
+.ds-button--md {
+  font-size: var(--ds-font-size-md);
+  padding: var(--ds-space-3) var(--ds-space-5);
+}
+.ds-button--lg {
+  font-size: var(--ds-font-size-lg);
+  padding: var(--ds-space-4) var(--ds-space-6);
+}
+
+.ds-button--full {
+  width: 100%;
+}
+
+/* Variants */
+.ds-button--primary {
+  background: var(--ds-color-primary);
+  color: var(--ds-color-primary-contrast);
+}
+.ds-button--primary:hover:not(:disabled) {
+  background: var(--ds-color-primary-hover);
+}
+.ds-button--primary:active:not(:disabled) {
+  background: var(--ds-color-primary-active);
+}
+
+.ds-button--secondary {
+  background: var(--ds-color-primary-soft);
+  color: var(--ds-color-primary-active);
+}
+.ds-button--secondary:hover:not(:disabled) {
+  background: var(--ds-violet-50);
+}
+
+.ds-button--outline {
+  background: transparent;
+  color: var(--ds-color-primary);
+  border-color: var(--ds-color-primary);
+}
+.ds-button--outline:hover:not(:disabled) {
+  background: var(--ds-color-primary-soft);
+}
+
+.ds-button--ghost {
+  background: transparent;
+  color: var(--ds-color-text);
+}
+.ds-button--ghost:hover:not(:disabled) {
+  background: var(--ds-gray-50);
+}
+
+.ds-button--danger {
+  background: var(--ds-color-error);
+  color: var(--ds-white);
+}
+.ds-button--danger:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
