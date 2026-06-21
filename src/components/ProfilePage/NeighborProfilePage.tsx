@@ -61,9 +61,12 @@ function NeighborProfilePage() {
         <p className="profile-card__bio">{profile.bio}</p>
 
         <div className="profile-card__actions">
-          {/* TODO: open a chat with this specific neighbor once chat threads
-              exist; for now we link to the chats list as a placeholder. */}
-          <Link to="/chats" style={{ textDecoration: 'none' }}>
+          {/* Opens the chat thread with this neighbour directly (the ChatPage
+              honours the ?peer= deep link and selects the conversation). */}
+          <Link
+            to={`/chats?peer=${numericId}&name=${encodeURIComponent(profile.name)}`}
+            style={{ textDecoration: 'none' }}
+          >
             <Button
               variant="primary"
               fullWidth

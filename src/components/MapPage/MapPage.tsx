@@ -8,9 +8,6 @@ import {
   useMap,
 } from 'react-leaflet'
 import L from 'leaflet'
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
-import markerIcon from 'leaflet/dist/images/marker-icon.png'
-import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import 'leaflet/dist/leaflet.css'
 import { Link } from 'react-router-dom'
 import './MapPage.css'
@@ -18,18 +15,35 @@ import type { LatLng } from './geo'
 import { useGeolocation } from './useGeolocation'
 import { useNearbyUsers } from './useNearbyUsers'
 
-// Leaflet's default marker icons reference asset paths that break under
-// bundlers; point them at the imported asset URLs so markers render correctly.
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+// Eye-catching custom markers built with divIcon (inline SVG/HTML) so they
+// never depend on — or break as — an external image asset. A red pin with a
+// little user glyph marks neighbours; a blue dot marks the current user.
+const userIcon = L.divIcon({
+  className: 'map-marker',
+  html:
+    '<svg width="30" height="42" viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 22 12 22s12-13.5 12-22C24 5.37 18.63 0 12 0z" fill="#e53935"/>' +
+    '<circle cx="12" cy="12" r="7" fill="#fff"/>' +
+    '<path d="M12 8.1a2.3 2.3 0 1 1 0 4.6 2.3 2.3 0 0 1 0-4.6zm0 5.4c2.6 0 4.3 1.3 4.3 2.35v.35H7.7v-.35c0-1.05 1.7-2.35 4.3-2.35z" fill="#e53935"/>' +
+    '</svg>',
+  iconSize: [30, 42],
+  iconAnchor: [15, 42],
+  popupAnchor: [0, -38],
 })
 
-const RADIUS_OPTIONS_KM = [1, 2, 5, 10] as const
-const DEFAULT_RADIUS_KM = 2
+const selfIcon = L.divIcon({
+  className: 'map-marker',
+  html: '<div class="map-marker__self"></div>',
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+})
 
-/** Keeps the map centered on the user's position as the geolocation fix updates. */
+// University-lunch context: neighbours are within walking distance, so the
+// radius is measured in metres (hundreds, not kilometres).
+const RADIUS_OPTIONS_M = [100, 250, 500] as const
+const DEFAULT_RADIUS_M = 250
+
+/** Keeps the map centered on the user's position as the geolocation updates. */
 function RecenterMap({ center }: { center: LatLng }) {
   const map = useMap()
   useEffect(() => {
@@ -43,17 +57,17 @@ function RecenterMap({ center }: { center: LatLng }) {
  * nearby neighbours as markers; clicking a marker opens a popup linking to that
  * neighbour's profile.
  *
- * US04 (SCRUM-6): only neighbours inside the selected proximity radius are
- * shown, and the radius is drawn on the map — a user sees, and is seen by, only
- * people within their proximity bubble (privacy by design).
+ * US04 (SCRUM-6): only neighbours inside the selected proximity radius (in
+ * metres) are shown, and the radius is drawn on the map.
  *
- * Uses Leaflet + OpenStreetMap tiles (open source, no API key required).
+ * Uses Leaflet with the CartoDB "Positron" basemap (open data, no API key) —
+ * a clean, low-clutter style without terrain/relief labels.
  */
 function MapPage() {
   const { center, isLocating, hasFix } = useGeolocation()
-  const [radiusKm, setRadiusKm] = useState<number>(DEFAULT_RADIUS_KM)
+  const [radiusMeters, setRadiusMeters] = useState<number>(DEFAULT_RADIUS_M)
 
-  const { users } = useNearbyUsers(center, radiusKm)
+  const { users } = useNearbyUsers(center, radiusMeters)
 
   return (
     <div className="map-page">
@@ -72,12 +86,12 @@ function MapPage() {
         <label className="map-page__radius">
           Raio de proximidade
           <select
-            value={radiusKm}
-            onChange={(event) => setRadiusKm(Number(event.target.value))}
+            value={radiusMeters}
+            onChange={(event) => setRadiusMeters(Number(event.target.value))}
           >
-            {RADIUS_OPTIONS_KM.map((option) => (
+            {RADIUS_OPTIONS_M.map((option) => (
               <option key={option} value={option}>
-                {option} km
+                {option} m
               </option>
             ))}
           </select>
@@ -87,20 +101,20 @@ function MapPage() {
       <div className="map-page__canvas">
         <MapContainer
           center={[center.lat, center.lng]}
-          zoom={13}
+          zoom={16}
           scrollWheelZoom
           className="map-page__leaflet"
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
           <RecenterMap center={center} />
 
           {/* Proximity radius (US04): the bubble in which the user sees and is seen. */}
           <Circle
             center={[center.lat, center.lng]}
-            radius={radiusKm * 1000}
+            radius={radiusMeters}
             pathOptions={{
               color: '#2e7d32',
               weight: 2,
@@ -110,12 +124,16 @@ function MapPage() {
           />
 
           {/* Current user's position. */}
-          <Marker position={[center.lat, center.lng]}>
+          <Marker position={[center.lat, center.lng]} icon={selfIcon}>
             <Popup>Você</Popup>
           </Marker>
 
           {users.map((user) => (
-            <Marker key={user.id} position={[user.lat, user.lng]}>
+            <Marker
+              key={user.id}
+              position={[user.lat, user.lng]}
+              icon={userIcon}
+            >
               <Popup>
                 <div className="map-page__info">
                   <strong>{user.name}</strong>

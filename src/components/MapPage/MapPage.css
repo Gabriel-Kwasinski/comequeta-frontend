@@ -66,3 +66,23 @@
   color: var(--ds-violet-600);
   font-weight: var(--ds-font-weight-medium);
 }
+
+/* Custom Leaflet markers (divIcon): drop the default white box/border. */
+.map-marker {
+  background: transparent;
+  border: none;
+}
+
+.map-marker__self {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1e88e5;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1.5px #1e88e5;
+}
+
+/* Ensure the radius selector text is visible. */
+.map-page__radius select {
+  color: var(--ds-gray-900);
+}

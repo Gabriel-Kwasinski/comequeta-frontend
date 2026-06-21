@@ -25,6 +25,7 @@ function ChatPage() {
   // Deep link: /chats?peer=<id> opens a thread with a specific neighbour
   // (e.g. the "iniciar conversa" button on a neighbour profile).
   const peerParam = searchParams.get('peer')
+  const nameParam = searchParams.get('name')
   useEffect(() => {
     if (!peerParam) return
     const peerId = Number(peerParam)
@@ -41,8 +42,9 @@ function ChatPage() {
   const activeName = useMemo(() => {
     const conv = conversations.find((c) => c.peer_id === selectedPeer)
     if (conv) return conv.peer_name
+    if (nameParam) return nameParam
     return selectedPeer != null ? `Vizinho #${selectedPeer}` : ''
-  }, [conversations, selectedPeer])
+  }, [conversations, selectedPeer, nameParam])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
