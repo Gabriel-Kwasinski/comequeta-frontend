@@ -66,7 +66,7 @@ function NeighborProfilePage() {
 
         <span className="profile-card__meta">
           <Icon name="info" size={16} />
-          {profile.distance} de distância
+          {profile.distance}
         </span>
 
         <p className="profile-card__bio">{profile.bio}</p>
