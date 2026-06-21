@@ -23,3 +23,6 @@ openapi.json
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code worktrees/agent state
+.claude/
