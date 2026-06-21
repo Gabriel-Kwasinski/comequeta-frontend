@@ -141,24 +141,17 @@ export function useChat(currentUserId: number | undefined): UseChatResult {
       const trimmed = content.trim()
       if (peer == null || !trimmed) return
 
-      // Prefer the live socket; fall back to REST so delivery is resilient.
+      // Prefer the live socket; the server echoes the persisted message back to
+      // us (with its real id), so we do NOT render optimistically here — doing
+      // so would show the message twice (temp id + echoed real id).
       const socket = socketRef.current
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(buildSendFrame(peer, trimmed))
-        // Optimistically render our own message.
-        if (currentUserId != null) {
-          ingestMessage({
-            id: -Date.now(),
-            sender_id: currentUserId,
-            recipient_id: peer,
-            content: trimmed,
-            created_at: new Date().toISOString(),
-            read_at: null,
-          })
-        }
         return
       }
 
+      // REST fallback: the POST does not echo over the socket, so ingest the
+      // created message ourselves.
       try {
         const created = await sendMessage(peer, trimmed)
         ingestMessage(created)
@@ -166,7 +159,7 @@ export function useChat(currentUserId: number | undefined): UseChatResult {
         /* swallow; UI keeps the composer text via caller if desired */
       }
     },
-    [currentUserId, ingestMessage],
+    [ingestMessage],
   )
 
   return {
