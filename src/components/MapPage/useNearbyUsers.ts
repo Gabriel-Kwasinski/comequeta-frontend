@@ -18,25 +18,28 @@ export interface NearbyUser {
 }
 
 interface UseNearbyUsersResult {
-  /** Neighbours within `radiusKm` of `center`, nearest first. */
+  /** Neighbours within `radiusMeters` of `center`, nearest first. */
   users: NearbyUser[]
   isLoading: boolean
   error: Error | null
 }
 
 /**
- * Mock neighbours scattered around a reference point. Generated relative to
- * the provided center so there is always something to render regardless of the
- * user's real geolocation. Offsets are in degrees (~0.01deg ≈ 1.1 km).
+ * Mock neighbours scattered a few hundred metres around a reference point.
+ *
+ * The app's purpose is connecting people to have lunch together on a university
+ * campus, so neighbours are placed within walking distance (~tens to a few
+ * hundred metres), not kilometres.
  */
 function buildMockUsers(center: LatLng): NearbyUser[] {
+  // Offsets in degrees; ~0.001° ≈ 100 m. Kept small so everyone is nearby.
   const offsets = [
-    { dLat: 0.004, dLng: 0.006, name: 'Ana Souza' },
-    { dLat: -0.008, dLng: 0.003, name: 'Bruno Lima' },
-    { dLat: 0.012, dLng: -0.009, name: 'Carla Dias' },
-    { dLat: -0.015, dLng: -0.014, name: 'Diego Alves' },
-    { dLat: 0.03, dLng: 0.028, name: 'Elena Rocha' },
-    { dLat: -0.045, dLng: 0.05, name: 'Felipe Nunes' },
+    { dLat: 0.0006, dLng: 0.0007, name: 'Ana Souza' }, // ~95 m
+    { dLat: -0.0011, dLng: 0.0009, name: 'Bruno Lima' }, // ~155 m
+    { dLat: 0.0016, dLng: -0.0013, name: 'Carla Dias' }, // ~220 m
+    { dLat: -0.0021, dLng: -0.0019, name: 'Diego Alves' }, // ~305 m
+    { dLat: 0.0029, dLng: 0.0023, name: 'Elena Rocha' }, // ~400 m
+    { dLat: -0.0035, dLng: 0.003, name: 'Felipe Nunes' }, // ~495 m
   ]
 
   return offsets.map((offset, index) => ({
@@ -48,7 +51,7 @@ function buildMockUsers(center: LatLng): NearbyUser[] {
 }
 
 /**
- * Returns nearby users within `radiusKm` of `center`.
+ * Returns nearby users within `radiusMeters` of `center`.
  *
  * TODO(backend): the API schema (src/api/schema.d.ts) currently only exposes
  * auth + /users/me — there is no geolocation/nearby endpoint yet. Once a real
@@ -58,7 +61,7 @@ function buildMockUsers(center: LatLng): NearbyUser[] {
  */
 export function useNearbyUsers(
   center: LatLng,
-  radiusKm: number,
+  radiusMeters: number,
 ): UseNearbyUsersResult {
   const users = useMemo(() => {
     // US04 (SCRUM-6) — privacy: only neighbours inside the proximity radius are
@@ -67,15 +70,13 @@ export function useNearbyUsers(
     return buildMockUsers(center)
       .map((user) => ({
         user,
-        distance: haversineDistanceKm(center, {
-          lat: user.lat,
-          lng: user.lng,
-        }),
+        distanceMeters:
+          haversineDistanceKm(center, { lat: user.lat, lng: user.lng }) * 1000,
       }))
-      .filter(({ distance }) => distance <= radiusKm)
-      .sort((a, b) => a.distance - b.distance)
+      .filter(({ distanceMeters }) => distanceMeters <= radiusMeters)
+      .sort((a, b) => a.distanceMeters - b.distanceMeters)
       .map(({ user }) => user)
-  }, [center, radiusKm])
+  }, [center, radiusMeters])
 
   return { users, isLoading: false, error: null }
 }

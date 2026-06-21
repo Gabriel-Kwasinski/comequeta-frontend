@@ -5,22 +5,24 @@ import { useNearbyUsers } from './useNearbyUsers'
 
 const CENTER = { lat: -23.5614, lng: -46.6559 }
 
+function distanceMeters(user: { lat: number; lng: number }): number {
+  return haversineDistanceKm(CENTER, { lat: user.lat, lng: user.lng }) * 1000
+}
+
 describe('useNearbyUsers', () => {
-  it('only returns users within the radius (US04 privacy)', () => {
-    const radiusKm = 2
-    const { result } = renderHook(() => useNearbyUsers(CENTER, radiusKm))
+  it('only returns users within the radius in metres (US04 privacy)', () => {
+    const radiusMeters = 250
+    const { result } = renderHook(() => useNearbyUsers(CENTER, radiusMeters))
 
     expect(result.current.users.length).toBeGreaterThan(0)
     for (const user of result.current.users) {
-      expect(
-        haversineDistanceKm(CENTER, { lat: user.lat, lng: user.lng }),
-      ).toBeLessThanOrEqual(radiusKm)
+      expect(distanceMeters(user)).toBeLessThanOrEqual(radiusMeters)
     }
   })
 
   it('returns more users as the radius grows', () => {
-    const { result: small } = renderHook(() => useNearbyUsers(CENTER, 1))
-    const { result: large } = renderHook(() => useNearbyUsers(CENTER, 10))
+    const { result: small } = renderHook(() => useNearbyUsers(CENTER, 100))
+    const { result: large } = renderHook(() => useNearbyUsers(CENTER, 500))
 
     expect(large.current.users.length).toBeGreaterThanOrEqual(
       small.current.users.length,
@@ -28,10 +30,8 @@ describe('useNearbyUsers', () => {
   })
 
   it('sorts users from nearest to farthest', () => {
-    const { result } = renderHook(() => useNearbyUsers(CENTER, 10))
-    const distances = result.current.users.map((user) =>
-      haversineDistanceKm(CENTER, { lat: user.lat, lng: user.lng }),
-    )
+    const { result } = renderHook(() => useNearbyUsers(CENTER, 500))
+    const distances = result.current.users.map(distanceMeters)
     const sorted = [...distances].sort((a, b) => a - b)
     expect(distances).toEqual(sorted)
   })
