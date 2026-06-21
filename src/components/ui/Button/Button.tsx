@@ -17,6 +17,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: ButtonSize
   /** Stretch to the full width of the container. */
   fullWidth?: boolean
+  /** Render with a fully rounded pill shape (as on the auth screens). */
+  pill?: boolean
   /** Optional leading element (e.g. an `<Icon />`). */
   leadingIcon?: ReactNode
   /** Optional trailing element (e.g. an `<Icon />`). */
@@ -33,6 +35,7 @@ export function Button({
   variant = 'primary',
   size = 'md',
   fullWidth = false,
+  pill = false,
   leadingIcon,
   trailingIcon,
   className,
@@ -45,6 +48,7 @@ export function Button({
     `ds-button--${variant}`,
     `ds-button--${size}`,
     fullWidth ? 'ds-button--full' : '',
+    pill ? 'ds-button--pill' : '',
     className ?? '',
   ]
     .filter(Boolean)

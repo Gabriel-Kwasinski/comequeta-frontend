@@ -18,7 +18,7 @@ export type { IconProps, IconName } from './Icon/Icon'
 
 export { ToastProvider } from './Toast/ToastProvider'
 export type { ToastProviderProps } from './Toast/ToastProvider'
-export { useToast } from './Toast/useToast'
+export { useToast, useOptionalToast } from './Toast/useToast'
 export type {
   ToastOptions,
   ToastVariant,

@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
+import { Button, Input, useOptionalToast } from '../ui'
 import './Login.css'
 import { validateEmail, validateLoginPassword } from './validation'
 
@@ -12,6 +13,7 @@ interface FieldErrors {
 function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const toast = useOptionalToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -40,9 +42,12 @@ function Login() {
     try {
       await login(email, password)
       setIsSuccess(true)
+      toast?.success('Login realizado! Redirecionando…')
       navigate('/map')
     } catch {
-      setFormError('E-mail ou senha inválidos. Verifique suas credenciais.')
+      const message = 'E-mail ou senha inválidos. Verifique suas credenciais.'
+      setFormError(message)
+      toast?.error(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -56,7 +61,8 @@ function Login() {
       </div>
       <div className="inputs">
         <div className="input">
-          <input
+          <Input
+            bare
             type="email"
             placeholder="Email"
             value={email}
@@ -69,7 +75,7 @@ function Login() {
             }
             aria-label="E-mail"
             aria-required="true"
-            aria-invalid={!!fieldErrors.email}
+            invalid={!!fieldErrors.email}
             aria-describedby={
               fieldErrors.email ? 'login-email-error' : undefined
             }
@@ -84,7 +90,8 @@ function Login() {
       </div>
       <div className="inputs">
         <div className="input">
-          <input
+          <Input
+            bare
             type="password"
             placeholder="Senha"
             value={password}
@@ -97,7 +104,7 @@ function Login() {
             }
             aria-label="Senha"
             aria-required="true"
-            aria-invalid={!!fieldErrors.password}
+            invalid={!!fieldErrors.password}
             aria-describedby={
               fieldErrors.password ? 'login-password-error' : undefined
             }
@@ -124,13 +131,15 @@ function Login() {
         </p>
       )}
       <div className="submit-container">
-        <button
+        <Button
           className="submit"
+          variant="primary"
+          pill
           type="submit"
           disabled={isSubmitting || isSuccess}
         >
           {isSubmitting ? 'Entrando…' : 'Entrar'}
-        </button>
+        </Button>
       </div>
       <div className="register">
         Nao tem uma conta?

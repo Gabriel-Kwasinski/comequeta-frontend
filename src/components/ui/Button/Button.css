@@ -4,7 +4,8 @@
   justify-content: center;
   gap: var(--ds-space-2);
   font-family: var(--ds-font-sans);
-  font-weight: var(--ds-font-weight-semibold);
+  /* The screens' primary action buttons are bold, matching the DS default. */
+  font-weight: var(--ds-font-weight-bold);
   line-height: 1;
   border: 1px solid transparent;
   border-radius: var(--ds-radius-md);
@@ -45,6 +46,11 @@
 
 .ds-button--full {
   width: 100%;
+}
+
+/* Fully rounded pill shape, as used by the auth screens' submit button. */
+.ds-button--pill {
+  border-radius: var(--ds-radius-pill);
 }
 
 /* Variants */

@@ -16,6 +16,12 @@ export interface InputProps extends Omit<
   leadingAdornment?: ReactNode
   /** Element rendered after the input (e.g. an icon or button). */
   trailingAdornment?: ReactNode
+  /**
+   * Render only the raw `<input>` (no label/control/help chrome) so a screen
+   * can supply its own surrounding markup while still benefiting from the DS
+   * input element. Used by the auth screens to preserve their exact layout.
+   */
+  bare?: boolean
 }
 
 /**
@@ -35,11 +41,26 @@ export function Input({
   disabled,
   className,
   id,
+  bare = false,
   ...rest
 }: InputProps) {
   const generatedId = useId()
   const inputId = id ?? generatedId
   const helpId = helpText ? `${inputId}-help` : undefined
+
+  if (bare) {
+    return (
+      <input
+        id={id}
+        className={['ds-field__input', className ?? '']
+          .filter(Boolean)
+          .join(' ')}
+        disabled={disabled}
+        aria-invalid={invalid || undefined}
+        {...rest}
+      />
+    )
+  }
 
   const wrapperClasses = [
     'ds-field',
