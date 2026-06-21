@@ -1,0 +1,176 @@
+.chat-page {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: var(--ds-space-4);
+  height: calc(100vh - 120px);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  color: var(--ds-color-text);
+}
+
+/* ---- Conversation list ---- */
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-color-surface);
+  overflow: hidden;
+}
+
+.chat-list__title {
+  margin: 0;
+  padding: var(--ds-space-4);
+  font-size: var(--ds-font-size-lg);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-color-heading);
+  border-bottom: 1px solid var(--ds-color-border);
+}
+
+.chat-list__items {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  width: 100%;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: none;
+  border-bottom: 1px solid var(--ds-color-border);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--ds-transition-fast);
+}
+
+.chat-list__item:hover {
+  background: var(--ds-color-primary-soft);
+}
+
+.chat-list__item--active {
+  background: var(--ds-color-primary-soft);
+  border-left: 3px solid var(--ds-color-primary);
+}
+
+.chat-list__item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+}
+
+.chat-list__name {
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-color-text);
+}
+
+.chat-list__unread {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--ds-space-1);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-primary);
+  color: var(--ds-color-text-on-primary);
+  font-size: var(--ds-font-size-xs);
+  font-weight: var(--ds-font-weight-semibold);
+}
+
+.chat-list__preview {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-list__empty {
+  padding: var(--ds-space-5) var(--ds-space-4);
+  color: var(--ds-color-text-muted);
+  font-size: var(--ds-font-size-sm);
+}
+
+/* ---- Thread ---- */
+.chat-thread {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-color-surface);
+  overflow: hidden;
+}
+
+.chat-thread__header {
+  padding: var(--ds-space-4);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-color-heading);
+  border-bottom: 1px solid var(--ds-color-border);
+}
+
+.chat-thread__messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4);
+  overflow-y: auto;
+  background: var(--ds-color-bg);
+}
+
+.chat-bubble {
+  max-width: 70%;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border-radius: var(--ds-radius-lg);
+  font-size: var(--ds-font-size-sm);
+  line-height: var(--ds-line-height-normal);
+  word-break: break-word;
+}
+
+.chat-bubble--mine {
+  align-self: flex-end;
+  background: var(--ds-color-primary);
+  color: var(--ds-color-text-on-primary);
+  border-bottom-right-radius: var(--ds-radius-sm);
+}
+
+.chat-bubble--theirs {
+  align-self: flex-start;
+  background: var(--ds-color-primary-soft);
+  color: var(--ds-color-text);
+  border-bottom-left-radius: var(--ds-radius-sm);
+}
+
+.chat-thread__composer {
+  display: flex;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-top: 1px solid var(--ds-color-border);
+}
+
+.chat-thread__composer .ds-field {
+  flex: 1;
+}
+
+.chat-thread__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ds-space-6);
+  color: var(--ds-color-text-muted);
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .chat-page {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
