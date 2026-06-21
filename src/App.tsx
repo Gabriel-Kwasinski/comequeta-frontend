@@ -8,6 +8,7 @@ import Signup from './components/LoginSignup/Signup.tsx'
 import MapPage from './components/MapPage/MapPage.tsx'
 import ChatPage from './components/ChatPage/ChatPage.tsx'
 import ProfilePage from './components/ProfilePage/ProfilePage.tsx'
+import NeighborProfilePage from './components/ProfilePage/NeighborProfilePage.tsx'
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth()
@@ -48,6 +49,7 @@ function App() {
             <Route path="/map" element={<MapPage />} />
             <Route path="/chats" element={<ChatPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:id" element={<NeighborProfilePage />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
