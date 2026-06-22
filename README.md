@@ -1,3 +1,22 @@
+# How to run on the phone
+
+Run the backend on the backend folder.
+
+connect phone to usb.
+
+Run this:
+```
+adb reverse tcp:8000 tcp:8000
+```
+
+(necessary to forward the backend port to the phone. no need for ngrok! You have to use ngrok though if you want to disconnect phone from computer)
+
+
+Then run the frontend:
+```
+npx --package @capacitor/cli cap run android
+```
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
