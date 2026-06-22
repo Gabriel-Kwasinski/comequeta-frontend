@@ -58,6 +58,42 @@
   line-height: 1.5;
 }
 
+.profile-card__bio-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  width: 100%;
+  text-align: left;
+}
+
+.profile-card__bio-label {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-muted);
+}
+
+.profile-card__bio-input {
+  width: 100%;
+  resize: vertical;
+  min-height: 5rem;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  font: inherit;
+  color: var(--ds-color-text);
+  background: var(--ds-color-surface);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-md);
+}
+
+.profile-card__bio-input:focus-visible {
+  outline: 2px solid var(--ds-color-primary);
+  outline-offset: 1px;
+}
+
+.profile-card__bio-count {
+  align-self: flex-end;
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-muted);
+}
+
 .profile-card__actions {
   display: flex;
   flex-direction: column;

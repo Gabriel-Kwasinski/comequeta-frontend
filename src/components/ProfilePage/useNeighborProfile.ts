@@ -2,9 +2,9 @@
  * Neighbour profile data layer (SCRUM-7 / US05).
  *
  * Resolves a neighbour picked from the map to a REAL registered account
- * (via `GET /users`), so the name shown on the profile — and carried into the
- * chat — matches the real user. Bio/avatar are still placeholders until the
- * backend stores richer profile data.
+ * (via `GET /users`), so the name and bio shown on the profile — and the name
+ * carried into the chat — match the real user. The avatar is still a
+ * placeholder until the backend stores profile images.
  */
 import { useQuery } from '@tanstack/react-query'
 import { getUsers } from '../ChatPage/chatApi'
@@ -40,7 +40,9 @@ export function useNeighborProfile(id: number): UseNeighborProfileResult {
     ? {
         id,
         name: match.name,
-        bio: 'Este vizinho ainda não preencheu uma descrição.',
+        bio: match.bio?.trim()
+          ? match.bio
+          : 'Este vizinho ainda não preencheu uma descrição.',
         avatarUrl: `https://i.pravatar.cc/160?u=${id}`,
         distance: 'Por perto',
       }

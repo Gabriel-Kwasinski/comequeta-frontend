@@ -25,6 +25,7 @@ export interface ChatUser {
   id: number
   name: string
   email: string
+  bio: string | null
 }
 
 /** Inbound WebSocket frame (server → client). */
