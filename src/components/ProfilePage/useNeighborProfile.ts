@@ -43,7 +43,7 @@ export function useNeighborProfile(id: number): UseNeighborProfileResult {
         bio: match.bio?.trim()
           ? match.bio
           : 'Este vizinho ainda não preencheu uma descrição.',
-        avatarUrl: `https://i.pravatar.cc/160?u=${id}`,
+        avatarUrl: ``,
         distance: 'Por perto',
       }
     : undefined
